@@ -1,6 +1,3 @@
-# golden-retriever: 
-#### WE NEED A BETTER NAME
-CSCE-670 Course Project
-#### WE NEED A BETTER NAME
-Say Whaaaaaaa
-#### WE NEED A BETTER NAME
+# r/ecommender
+
+A subreddit recommender system (e.g.: r/worldnews is the subreddit for world news) for users based on their comment history.
