@@ -116,7 +116,7 @@ def BPRLoss(batch_xuij):
     return torch.log(torch.sigmoid(xuij)).sum()
 
 
-def data_gen(train_data=data, batch_size=16):
+def data_gen(train_data, batch_size=8):
     """
     Yields batches of training data with given batch size
 
@@ -132,18 +132,19 @@ def data_gen(train_data=data, batch_size=16):
 
     for user in interactions_dict:
         for item in interactions_dict[user]:
-            X = torch.LongTensor(batch_size, 3)
+            X = np.zeros((batch_size, 3))
             X[:, 0] = user
             X[:, 1] = item
             js = [np.random.randint(num_items) for _ in range(2 * batch_size)]
             row_index = 0
             for j in js:
-                if j not in interactions_dict[user]:
+                if j not in interactions_dict[user] and row_index < batch_size:
                     X[row_index, 2] = j
                     row_index += 1
 
             # just repeat the first row remaining times
             if row_index < batch_size:
                 X[row_index, 2] = X[0, 2]
+                row_index += 1
 
-            yield X
+            yield torch.as_tensor(X, dtype=torch.long)
