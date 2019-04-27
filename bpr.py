@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -108,3 +109,41 @@ class vBPR(nn.Module):
         j_indices = trg_batch[:, 2]
         return self.get_xui(user_indices, i_indices) - \
             self.get_xui(user_indices, j_indices)
+
+
+def BPRLoss(batch_xuij):
+    "Return the loss for a batch of xuij predictions"
+    return torch.log(torch.sigmoid(xuij)).sum()
+
+
+def data_gen(train_data=data, batch_size=16):
+    """
+    Yields batches of training data with given batch size
+
+    Args:
+        train_data : Interaction, which contains user, i, count tuples
+
+    Yields :
+        batch of (u, i, j) tuples
+    """
+    interactions_dict = train_data.get_interaction_dict()
+    num_items = train_data.num_items
+    num_users = train_data.num_users
+
+    for user in interactions_dict:
+        for item in interactions_dict[user]:
+            X = torch.LongTensor(batch_size, 3)
+            X[:, 0] = user
+            X[:, 1] = item
+            js = [np.random.randint(num_items) for _ in range(2 * batch_size)]
+            row_index = 0
+            for j in js:
+                if j not in interactions_dict[user]:
+                    X[row_index, 2] = j
+                    row_index += 1
+
+            # just repeat the first row remaining times
+            if row_index < batch_size:
+                X[row_index, 2] = X[0, 2]
+
+            yield X
