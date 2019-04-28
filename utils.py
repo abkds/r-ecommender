@@ -27,7 +27,7 @@ class Interaction():
     def get_interaction_dict(self):
         "Returns the interactions in the form of dictionary"
         if self.interactions_dict is None:
-            self.interactions_dict = defaultdict(lambda: set())
-            for user, item, _ in self.interactions:
-                self.interactions_dict[user].add(item)
+            self.interactions_dict = defaultdict(lambda: defaultdict(lambda: 0))
+            for user, item, count in self.interactions:
+                self.interactions_dict[user][item] = int(count)
         return self.interactions_dict
