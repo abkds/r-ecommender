@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 from torch.nn.init import normal_
 
 
@@ -113,7 +114,7 @@ class vBPR(nn.Module):
 
 def BPRLoss(batch_xuij):
     "Return the loss for a batch of xuij predictions"
-    return torch.log(torch.sigmoid(xuij)).sum()
+    return -torch.log(torch.sigmoid(xuij)).sum()
 
 
 def data_gen(train_data, batch_size=8):
@@ -148,3 +149,61 @@ def data_gen(train_data, batch_size=8):
                 row_index += 1
 
             yield torch.as_tensor(X, dtype=torch.long)
+
+
+num_epochs = 1
+
+
+def train(
+        num_latent_factors,
+        num_visual_factors,
+        num_embedding_factors,
+        num_users,
+        num_items,
+        train_data_gen,
+        visual_features,
+        dropout=0.1):
+    "trains the network over the training data"
+    model = vBPR(num_latent_factors=num_latent_factors,
+                 num_visual_factors=num_visual_factors,
+                 num_embedding_factors=num_embedding_factors,
+                 num_users=num_users,
+                 num_items=num_items,
+                 visual_features=visual_features,
+                 dropout=dropout)
+
+    # initialize variables
+    loss = 0
+    print_losses = []
+
+    # can try other optimizers here
+    optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
+
+    num_batches = 1000
+    i = 0
+    for epoch in range(num_epochs):
+        running_loss = 0.0
+        for trg_batch in train_data_gen:
+            if i >= num_batches:
+                break
+
+            # zero the parameter gradients
+            optimizer.zero_grad()
+
+            # forward + backward + optimizer
+            outputs = model(trg_batch)
+            loss = BPRLoss(outputs)
+            loss.backward()
+            optimizer.step()
+
+            # print statistics
+            running_loss += loss.item()
+
+            if i % 100 == 99:    # print every 2000 mini-batches
+                print('[%d, %5d] loss: %.3f' %
+                      (epoch + 1, i + 1, running_loss / 2000))
+                running_loss = 0.0
+
+            i += 1
+
+    print('Finished Training')
