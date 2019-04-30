@@ -52,6 +52,10 @@ Subreddit recommendation is an important unsolved problem in the broad field of 
 For evaluation, we split our data into two sets- training and test data. We initially have a list of subreddits a user subscribes to. We take out 10% of subreddits associated with a user and add them to our test set. Once training is complete, we test how many of the subreddits we removed in thte initial set are present in our recommendations. We used the following evaluation model to test our models:
 #### Area-Under-the-Curve (AUC)
   This [evaluation criteria](https://wen.wikipedia.org/wiki/Receiver_operating_characteristic#/Area_under_the_curve) gives the probability that a classifier will rank a randomly chosen positive instance higher than a randomly chosen negative one. Because our models are _comparison based_, AUC works well as its defition pertains to the number of comparisons we perform correctly.
+  
+<img src="https://github.com/abkds/r-ecommender/blob/master/AUCs.png" height="350">
+
+  
 
 #### Techonolgies used - a brief list of libraries and languages
 * Python 3
