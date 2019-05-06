@@ -67,5 +67,4 @@ For evaluation, we split our data into two sets- training and test data. We init
 * scipy
 * nltk
 
-#### Examples
-Coming soon!
+#### [arxiv link](https://arxiv.org/abs/1905.01263)
